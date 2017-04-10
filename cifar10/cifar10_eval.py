@@ -51,7 +51,7 @@ tf.app.flags.DEFINE_string('eval_data', 'test',
                            """Either 'test' or 'train_eval'.""")
 tf.app.flags.DEFINE_string('checkpoint_dir', '/tmp/cifar10_train',
                            """Directory where to read model checkpoints.""")
-tf.app.flags.DEFINE_integer('eval_interval_secs', 60 * 5,
+tf.app.flags.DEFINE_integer('eval_interval_secs', 60 * 2,
                             """How often to run the eval.""")
 tf.app.flags.DEFINE_integer('num_examples', 10000,
                             """Number of examples to run.""")
@@ -100,6 +100,8 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
 
       # Compute precision @ 1.
       precision = true_count / total_sample_count
+      print('true_count @ 1 = %.3f' % (true_count))
+      print('total_sample_count @ 1 = %.3f' % (total_sample_count))
       print('%s: precision @ 1 = %.3f' % (datetime.now(), precision))
 
       summary = tf.Summary()
