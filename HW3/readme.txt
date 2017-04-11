@@ -83,7 +83,7 @@ Add a dropout rate (0.75) at the last FC layer
 2017-04-11 01:47:22.407121: precision @ 1 = 0.902
 ------------------------------------------------------------------------------------------
 Change 5
-Add a dropout rate (0.75) at the last FC layer
+Remove Image distortions (Preprocessing)
 2017-04-09 23:19:06.973041: step 0, loss = 3.07 (123.1 examples/sec; 1.040 sec/batch)
 2017-04-09 23:20:37.072487: step 100, loss = 2.78 (146.8 examples/sec; 0.872 sec/batch)
 2017-04-09 23:44:47.935910: step 500, loss = 1.91 (65.5 examples/sec; 1.955 sec/batch)
