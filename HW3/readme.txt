@@ -14,8 +14,7 @@ Types of changes I tried -
 3. Increase / Decrease Kernel (Filter) size
 4. Increase / Decrease Max_Pool size
 5. Increase / Decrease Learning Rate
-6. Try different activation function (Leaky relu - which may capture negative functions)
-7. Introduce Dropouts
+6. Introduce Dropouts
 
 Default Model architecture - 
 CONV -> POOL -> NORM -> CONV -> NORM -> POOL -> FC -> FC -> SOFTMAX
@@ -76,16 +75,40 @@ More learning rate means that the system increase weights faster and has a tende
 ------------------------------------------------------------------------------------------
 Change 5
 Add a dropout rate (0.75) at the last FC layer
+
 2017-04-11 01:18:30.176568: step 0, loss = 3.06 (132.2 examples/sec; 0.968 sec/batch)
 2017-04-11 01:20:56.615594: step 100, loss = 2.80 (92.4 examples/sec; 1.385 sec/batch)
 2017-04-11 01:34:01.171697: step 500, loss = 1.97 (96.7 examples/sec; 1.323 sec/batch)
 2017-04-11 01:47:36.840451: step 990, loss = 1.32 (98.9 examples/sec; 1.294 sec/batch)
 2017-04-11 01:47:22.407121: precision @ 1 = 0.902
+
+2017-04-11 11:39:48.621591: step 0, loss = 3.07 (115.9 examples/sec; 1.104 sec/batch)
+2017-04-11 11:41:13.632959: step 100, loss = 2.74 (149.5 examples/sec; 0.856 sec/batch)
+2017-04-11 11:49:09.158405: step 500, loss = 2.02 (115.6 examples/sec; 1.107 sec/batch)
+2017-04-11 11:59:49.824251: step 1000, loss = 1.30 (111.4 examples/sec; 1.149 sec/batch)
+2017-04-11 12:10:20.544418: step 1500, loss = 1.11 (63.8 examples/sec; 2.005 sec/batch)
+2017-04-11 12:20:59.367277: step 2000, loss = 0.86 (122.9 examples/sec; 1.041 sec/batch)
+2017-04-11 12:33:09.177761: step 2500, loss = 0.52 (57.0 examples/sec; 2.247 sec/batch)
+2017-04-11 12:45:11.277393: step 3000, loss = 0.52 (54.1 examples/sec; 2.366 sec/batch)
+2017-04-11 12:56:57.751289: step 3500, loss = 0.41 (49.4 examples/sec; 2.590 sec/batch)
+2017-04-11 13:07:50.094229: step 4000, loss = 0.44 (80.6 examples/sec; 1.587 sec/batch)
+2017-04-11 13:29:05.167141: step 5000, loss = 0.24 (112.9 examples/sec; 1.133 sec/batch)
+2017-04-11 13:40:33.282620: step 5500, loss = 0.20 (113.7 examples/sec; 1.126 sec/batch)
+2017-04-11 13:47:17.619896: step 5770, loss = 0.22 (106.7 examples/sec; 1.199 sec/batch)
+2017-04-11 13:31:05.273371: precision @ 1 = 0.942
+
+Analysis
+Dropout randomly drops units from the neural network and helps to avoid overfitting in the training data.
+In this case, a dropout of 0.75 has been introduced after the 2nd fully connected layer (local4). This increases the accuray of the model thus gives us better classification.
 ------------------------------------------------------------------------------------------
-Change 5
+Change 6
 Remove Image distortions (Preprocessing)
 2017-04-09 23:19:06.973041: step 0, loss = 3.07 (123.1 examples/sec; 1.040 sec/batch)
 2017-04-09 23:20:37.072487: step 100, loss = 2.78 (146.8 examples/sec; 0.872 sec/batch)
 2017-04-09 23:44:47.935910: step 500, loss = 1.91 (65.5 examples/sec; 1.955 sec/batch)
 2017-04-09 23:53:28.327674: step 990, loss = 1.35 (124.3 examples/sec; 1.030 sec/batch)
 2017-04-11 02:21:14.504811: precision @ 1 = 0.879
+
+Analysis
+Removing the distortions would reduce the accuracy of the model as observed.
+This is because clear images, give the model to activate on all the features in the image and not concentrate on the important ones which may actually be helpful in the classification.
