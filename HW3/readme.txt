@@ -1,12 +1,12 @@
-python cifar10_train.py
-python cifar10_eval.py
-tensorboard --logdir=/tmp/cifar10_train;/tmp/cifar10_eval
+Vineet Ahirkar - CMSC 678 HW 3
 ------------------------------------------------------------------------------------------
-
-No of iterations - 1000
+Default No of iterations - 1000
 Code to convert cifar10 to cifar2 dataset (written in Ruby) contained in - parse.rb
 All models have been for 1000 max iterations.
 Initial Accuracy - 0.894
+
+Default Model architecture - 
+CONV -> POOL -> NORM -> CONV -> NORM -> POOL -> FC -> FC -> SOFTMAX
 
 Types of changes I tried - 
 1. Increase / Decrease CONV+POOL+NORM layers
@@ -15,10 +15,6 @@ Types of changes I tried -
 4. Increase / Decrease Max_Pool size
 5. Increase / Decrease Learning Rate
 6. Introduce Dropouts
-
-Default Model architecture - 
-CONV -> POOL -> NORM -> CONV -> NORM -> POOL -> FC -> FC -> SOFTMAX
-
 ------------------------------------Changes------------------------------------
 Unchaged Model Stats - 
 2017-04-09 20:35:48.922687: step 0, loss = 3.07 (119.9 examples/sec; 1.067 sec/batch)
@@ -47,7 +43,7 @@ Add 1 FC layer + Remove 1 Conv+Pool+Norm
 2017-04-10 23:08:35.554691: precision @ 1 = 0.871
 
 Analysis
-By removing one layer of Conv+Pool+Norm, there is a obvious drop in the accuracy as fewer/smipler features are extracted from the image thus resulting in lower odds of classifing the data correctly.
+By removing one layer of Conv+Pool+Norm, there is a obvious drop in the accuracy as fewer/simpler features are extracted from the image thus resulting in lower odds of classifing the data correctly.
 ------------------------------------------------------------------------------------------
 Change 3
 Add 1 Conv+Pool+Norm + Decrease Kernel size (3x3) + Decrease Max pool size (2x2) + Add 1 FC layer
@@ -61,6 +57,7 @@ Analysis
 Adding more conv+pool+norm layers can detect more complex features in the image.
 Decreasing the kernel size increases the locality of the convolution, making it narrower.
 Adding 1 more FC will try to factor in more non-linearity in the features already detected by the conv layer.
+In this case, the accuracy actually decreases marginally, making this change not effective.
 ------------------------------------------------------------------------------------------
 Change 4
 Increase learning rate (0.2)
@@ -75,12 +72,6 @@ More learning rate means that the system increase weights faster and has a tende
 ------------------------------------------------------------------------------------------
 Change 5
 Add a dropout rate (0.75) at the last FC layer
-
-2017-04-11 01:18:30.176568: step 0, loss = 3.06 (132.2 examples/sec; 0.968 sec/batch)
-2017-04-11 01:20:56.615594: step 100, loss = 2.80 (92.4 examples/sec; 1.385 sec/batch)
-2017-04-11 01:34:01.171697: step 500, loss = 1.97 (96.7 examples/sec; 1.323 sec/batch)
-2017-04-11 01:47:36.840451: step 990, loss = 1.32 (98.9 examples/sec; 1.294 sec/batch)
-2017-04-11 01:47:22.407121: precision @ 1 = 0.902
 
 2017-04-11 11:39:48.621591: step 0, loss = 3.07 (115.9 examples/sec; 1.104 sec/batch)
 2017-04-11 11:41:13.632959: step 100, loss = 2.74 (149.5 examples/sec; 0.856 sec/batch)
