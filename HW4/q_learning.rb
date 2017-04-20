@@ -1,108 +1,126 @@
+# require 'gruff'
 DIRECTIONS = {LEFT: 0, RIGHT: 1, UP: 2, DOWN: 3}
 DIRECTIONS_1 = {0 => :LEFT, 1 => :RIGHT, 2 => :UP, 3 => :DOWN}
 $learning_rate = 0.5
 $discount_rate = 0.8
-$exploration_threshold = 0.5
 episodes = 1000
 
-# $q_table = Array.new(225) { Array.new(4){ rand(0...100) } }
-$q_table = Array.new(225) { Array.new(4){ 0 } }
-$reward_table = Array.new(225) { Array.new(4){ 0 } }
+$grid_size = 15
+
+init_value = 0 # rand(100...1000)
+$q_table = Array.new($grid_size) { Array.new($grid_size) { Array.new(4){ init_value } } }
+$reward_table = Array.new($grid_size) { Array.new($grid_size) { Array.new(4){ -1 } } }
+
+def print_q_table
+	DIRECTIONS.each do |k,v|
+		puts "----------#{k}-----------"
+		$q_table.each do |row|
+			row.each do |col|
+				printf "%5s ", col[v].round(3)
+			end
+			puts ""
+		end		
+	end
+end
 
 def get_next_action(current_state)
-	if rand < $exploration_threshold || has_same_q_values?(current_state)
-		action = rand(4) # pick a random action
+	if has_same_q_values?(current_state)
+		rand(4) # pick a random action  # DIRECTIONS[:RIGHT]
 	else
-		action = get_q_max(current_state)
+		get_q_max_value(current_state)
 	end
-
-	# DIRECTIONS_1[action]
-	action
 end
 
 def get_next_state(current_state, action)
-	reward = $reward_table[current_state][action]
-	if reward == -1
-		return current_state
+	case (DIRECTIONS_1[action])
+		when :UP
+			next_state = [current_state[0]-1,current_state[1]]
+		when :DOWN
+			next_state = [current_state[0]+1,current_state[1]]
+		when :LEFT
+			next_state = [current_state[0],current_state[1]-1]
+		when :RIGHT
+			next_state = [current_state[0],current_state[1]+1]
+		else
+			raise RuntimeError, "Invalid direction #{action}"
+	end
+
+	if next_state[0] >= $grid_size || next_state[1] >= $grid_size || next_state[0] < 0 || next_state[1] < 0 # dashed a wall
+		current_state
 	else
-		case (DIRECTIONS_1[action])
-			when :UP
-				return current_state - 15
-			when :DOWN
-				return current_state + 15
-			when :LEFT
-				return current_state - 1
-			when :RIGHT
-				return current_state + 1
-			else
-				return current_state
-		end
+		next_state
 	end
 end
 
 def init_rewards
-	set_penalty(0, 15, 1, DIRECTIONS[:UP])
-	set_penalty(225 - 15, 225, 1, DIRECTIONS[:DOWN])
-	set_penalty(0, (225 - 15) + 1, 15, DIRECTIONS[:LEFT])
-	set_penalty(15 - 1, 225, 15, DIRECTIONS[:RIGHT])
-	4.times {|i| $reward_table[225 - 1][i] = 100 }
-end
-
-def set_penalty(start_i, end_i, incremnet, action)
-	i = start_i
-
-	while(i < end_i) do
-		$reward_table[i][action] = -1
-		i = i + incremnet
-	end
+	$grid_size.times {|i| $reward_table[0][i][DIRECTIONS[:UP]] = -2 }
+	$grid_size.times {|i| $reward_table[$grid_size-1][i][DIRECTIONS[:DOWN]] = -2 }
+	$grid_size.times {|i| $reward_table[i][0][DIRECTIONS[:LEFT]] = -2 }
+	$grid_size.times {|i| $reward_table[i][$grid_size-1][DIRECTIONS[:RIGHT]] = -2 }
+	$reward_table[$grid_size-2][$grid_size-1][DIRECTIONS[:DOWN]] = 10
+	$reward_table[$grid_size-1][$grid_size-2][DIRECTIONS[:RIGHT]] = 10
+	# 4.times {|i| $reward_table[$grid_size-1][$grid_size-1][i] = 0 }
 end
 
 def get_reward(state, action)
-	$reward_table[state][action]
+	$reward_table[state[0]][state[1]][action]
+end
+
+def get_q_max_value(state)
+	max_action_value = get_q_max(state)
+	$q_table[state[0]][state[1]].index(max_action_value)
 end
 
 def get_q_max(state)
-	max_action_value = $q_table[state].max
-	$q_table[state].index(max_action_value)
+	$q_table[state[0]][state[1]].max
 end
 
 def has_same_q_values?(state)
-	$q_table[state].uniq.length == 1
+	$q_table[state[0]][state[1]].uniq.length == 1
 end
 
 def get_q_value(state, action)
-	$q_table[state][action]
+	$q_table[state[0]][state[1]][action]
 end
 
 def set_q_value(state, action, value)
-	$q_table[state][action] = value; nil
+	$q_table[state[0]][state[1]][action] = value; nil
 end
-
 
 init_rewards()
+array_of_steps = []
 # p $reward_table
-
-
 episodes.times do |episode|
-	current_state = 0
+	current_state = [0,0]
 	steps = 0
-	while(current_state != 224)
+	while(current_state != [$grid_size-1,$grid_size-1])
 		action = get_next_action(current_state)
-		# action = DIRECTIONS[_action]
 		next_state = get_next_state(current_state, action)	
+		# puts "#{current_state} + #{DIRECTIONS_1[action]} = #{next_state}"
+		old_q_value = get_q_value(current_state, action)
 
-		discounted_reward = $discount_rate * get_q_max(next_state)
-		temp = discounted_reward
-				+ get_reward(current_state, action)
-				- get_q_value(current_state, action)
-		value = get_q_value(current_state, action)
-				+ ($learning_rate * temp)
-		set_q_value(current_state, action, value)
+		# puts "old_q_value #{old_q_value}"
+		discounted_future_reward = $discount_rate * get_q_max(next_state)
+		immediate_reward = get_reward(current_state, action)
+		delta = immediate_reward + discounted_future_reward - old_q_value
+		# puts "delta: #{delta} = #{immediate_reward} + #{discounted_future_reward} - #{old_q_value}"
+		new_q_value = old_q_value + ($learning_rate * delta)
+		# puts "new_q_value: #{new_q_value}"
+		set_q_value(current_state, action, new_q_value)
 		
 		current_state = next_state
-
-		# puts "current_state: #{current_state}"
+		# puts "----------------------------------"
 		steps += 1
+		# break if steps > 1000
 	end
-	puts "#{episode} - #{steps}"
+	array_of_steps << steps
+	puts "#{steps}"
 end
+
+# print_q_table
+
+# g = Gruff::Bezier.new
+# g.title = 'Q-Learning with q_table initialized to 0'
+# g.data 'Steps', array_of_steps
+# g.minimum_value = 0
+# g.write("q_learning.png")
