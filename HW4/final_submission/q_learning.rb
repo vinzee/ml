@@ -19,7 +19,6 @@ class QLearner
 		init_rewards()
 	end
 
-
 	def print_q_table
 		DIRECTIONS.each do |k,v|
 			puts "----------#{k}-----------"
@@ -95,8 +94,9 @@ class QLearner
 		self.q_table[state[0]][state[1]][action] = value; nil
 	end
 
-	def run
+	def run(avg_by = 1)
 		all_steps = []
+		temp = []
 		episodes.times do |episode|
 			current_state = [0,0]
 			steps = 0
@@ -114,8 +114,14 @@ class QLearner
 				current_state = next_state
 				steps += 1
 			end
-			all_steps << steps
-			puts "#{steps}"
+			if (episode % avg_by) == 0 && temp.length != 0
+				sum = temp.reduce(:+)
+				all_steps << ( sum / temp.size.to_f)
+				temp = []
+			else
+				temp << steps
+			end
+			puts "steps - #{steps}"
 		end
 		# print_q_table
 		all_steps
@@ -127,13 +133,14 @@ class QLearner
 		g.data "Q_table_init: 0", steps_for_0
 		g.data "Q_table init: #{random_value}", steps_for_random
 		g.minimum_value = 0
+		g.dot_radius = 1
 		# g.line_width = 2
 		g.write("q_learning.png")
 	end
 end
 
-random_value = rand(100...1000)
-steps_for_0 = QLearner.new().run
-steps_for_random = QLearner.new().run
+random_value = 500 #rand(100...1000)
 
+steps_for_0 = QLearner.new().run(1)
+steps_for_random = QLearner.new(random_value).run(1)
 QLearner.print_graph(steps_for_0, steps_for_random, random_value)

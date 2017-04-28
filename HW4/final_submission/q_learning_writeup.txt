@@ -1,0 +1,28 @@
+2. Q-Learning
+------------------------------------------
+Q0   - Q-Learning models with Q-Table initialized to 0
+Q500 - Q-Learning models with Q-Table initialized to 500
+
+List of the parameters used in learning
+a. Rewards
+	Action leading to goal: 10
+	All other actions: -1 
+b. Discount Factor - 0.8
+c. Learning rate - 0.5
+d. Exploration probability - 0.0
+
+Code written in Ruby Language
+
+Output graph - 
+- Shows the comparison of Q0 and Q500.
+- Axis
+	vertical axis   - episodes
+	horizontal axis - number-of-steps
+- Averaging
+	q_learning_1.png - No averaging
+	q_learning_30.png - Averaging over 30 episodes
+- Differences
+	From the graph of averaged values, we see that Q0 learns the optimal path much quicker than Q500, thus giving better performance.
+	This is because - 
+	- High initial values cause the q-table values to be updated to lower values than the others, thus encouraging exploration.
+	- Lower initial values on the other hand, minimize exploration and go in the direction of max rewards sooner, thus leading to faster learning.
